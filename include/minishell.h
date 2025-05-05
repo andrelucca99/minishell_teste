@@ -11,25 +11,26 @@
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
-# define MINISHELL_H
+#define MINISHELL_H
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <string.h>
-# include <sys/wait.h>
-# include <readline/readline.h>
-# include <readline/history.h>
-# include "../libft/libft.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "../libft/libft.h"
 
-# define MAX_ARGS 128
+#define MAX_ARGS 128
 
-extern char	**environ;
+extern char **environ;
 
-int		is_builtin(char *cmd);
-int		exec_builtin(char **args);
-void	execute_command(char **args);
-char	**parse_input(char *line);
-void	execute_command(char **args);
+int is_builtin(char *cmd);
+int exec_builtin(char **args);
+void execute_command(char **args);
+char **parse_input(char *line);
+void execute_command(char **args);
+char *find_executable(char *cmd);
 
 #endif
