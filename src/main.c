@@ -6,7 +6,7 @@
 /*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 16:07:32 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/05 14:28:42 by andre            ###   ########.fr       */
+/*   Updated: 2025/05/05 14:56:50 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,24 @@ int detect_output_redir(char **args, char **outfile)
         {
             *outfile = args[i + 1];
             args[i] = NULL; // cortar a linha de argumentos aqui
+            return (1);
+        }
+        i++;
+    }
+    return (0);
+}
+
+int detect_input_redir(char **args, char **infile)
+{
+    int i;
+
+    i = 0;
+    while (args[i])
+    {
+        if (ft_strcmp(args[i], "<") == 0 && args[i + 1])
+        {
+            *infile = args[i + 1];
+            args[i] = NULL;
             return (1);
         }
         i++;
@@ -126,11 +144,13 @@ int main(void)
         args = parse_input(line);
         if (args && args[0])
         {
-            char *outfile = NULL;
-            int out_fd = -1;
-            int redir = detect_output_redir(args, &outfile);
+            char *outfile = NULL, *infile = NULL;
+            int out_fd = -1, in_fd = -1;
+            int saved_stdout = -1, saved_stdin = -1;
+            int redir_out = detect_output_redir(args, &outfile);
+            int redir_in = detect_input_redir(args, &infile);
 
-            if (redir)
+            if (redir_out)
             {
                 out_fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
                 if (out_fd < 0)
@@ -140,24 +160,40 @@ int main(void)
                     free(line);
                     continue;
                 }
-                int saved_stdout = dup(STDOUT_FILENO);
+                saved_stdout = dup(STDOUT_FILENO);
                 dup2(out_fd, STDOUT_FILENO);
+            }
+            if (redir_in)
+            {
+                in_fd = open(infile, O_RDONLY);
+                if (in_fd < 0)
+                {
+                    perror("open");
+                    free_args(args);
+                    free(line);
+                    continue;
+                }
+                saved_stdin = dup(STDIN_FILENO);
+                dup2(in_fd, STDIN_FILENO);
+            }
 
-                if (is_builtin(args[0]))
-                    exec_builtin(args);
-                else
-                    execute_command(args);
+            if (is_builtin(args[0]))
+                exec_builtin(args);
+            else
+                execute_command(args);
 
+            // Restaura saída e entrada padrão
+            if (redir_out)
+            {
                 dup2(saved_stdout, STDOUT_FILENO);
                 close(saved_stdout);
                 close(out_fd);
             }
-            else
+            if (redir_in)
             {
-                if (is_builtin(args[0]))
-                    exec_builtin(args);
-                else
-                    execute_command(args);
+                dup2(saved_stdin, STDIN_FILENO);
+                close(saved_stdin);
+                close(in_fd);
             }
         }
         free_args(args);
