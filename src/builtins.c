@@ -3,23 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
+/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:25:57 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/02 15:52:03 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:20:08 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	is_builtin(char *cmd)
+int is_builtin(char *cmd)
 {
-	return (strcmp(cmd, "cd") == 0
-		|| strcmp(cmd, "pwd") == 0
-		|| strcmp(cmd, "echo") == 0
-		|| strcmp(cmd, "env") == 0
-		|| strcmp(cmd, "export") == 0
-		|| strcmp(cmd, "unset") == 0
-		|| strcmp(cmd, "exit") == 0
-	);
+	return (ft_strcmp(cmd, "cd") == 0 || ft_strcmp(cmd, "pwd") == 0 || ft_strcmp(cmd, "echo") == 0 || ft_strcmp(cmd, "env") == 0 || ft_strcmp(cmd, "export") == 0 || ft_strcmp(cmd, "unset") == 0 || ft_strcmp(cmd, "exit") == 0);
 }

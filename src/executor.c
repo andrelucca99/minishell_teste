@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
+/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:37:17 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/02 15:51:48 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:24:26 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	exec_cd(char **args)
+int exec_cd(char **args)
 {
 	if (!args[1])
 		return (chdir(getenv("HOME")));
@@ -24,9 +24,9 @@ int	exec_cd(char **args)
 	return (0);
 }
 
-int	exec_pwd(void)
+int exec_pwd(void)
 {
-	char	cwd[1024];
+	char cwd[1024];
 
 	if (getcwd(cwd, sizeof(cwd)))
 		printf("%s\n", cwd);
@@ -35,15 +35,15 @@ int	exec_pwd(void)
 	return (0);
 }
 
-int	exec_echo(char **args)
+int exec_echo(char **args)
 {
-	int	i;
-	int	newline;
+	int i;
+	int newline;
 
 	i = 1;
 	newline = 1;
 
-	if (args[1] && strcmp(args[1], "-n") == 0)
+	if (args[1] && ft_strcmp(args[1], "-n") == 0)
 	{
 		newline = 0;
 		i = 2;
@@ -60,9 +60,9 @@ int	exec_echo(char **args)
 	return (0);
 }
 
-int	exec_env(void)
+int exec_env(void)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (environ[i])
@@ -73,15 +73,15 @@ int	exec_env(void)
 	return (0);
 }
 
-int	exec_export(char **args)
+int exec_export(char **args)
 {
-	char	*eq;
-	int		i;
+	char *eq;
+	int i;
 
 	i = 1;
 	while (args[i])
 	{
-		eq = strchr(args[i], '=');
+		eq = ft_strchr(args[i], '=');
 		if (eq)
 		{
 			*eq = '\0';
@@ -94,9 +94,9 @@ int	exec_export(char **args)
 	return (0);
 }
 
-int	exec_unset(char **args)
+int exec_unset(char **args)
 {
-	int	i;
+	int i;
 
 	i = 1;
 	while (args[i])
@@ -107,9 +107,9 @@ int	exec_unset(char **args)
 	return (0);
 }
 
-int	exec_exit(char **args)
+int exec_exit(char **args)
 {
-	int	status;
+	int status;
 
 	status = 0;
 	if (args[1])
@@ -118,21 +118,21 @@ int	exec_exit(char **args)
 	exit(status);
 }
 
-int	exec_builtin(char **args)
+int exec_builtin(char **args)
 {
-	if (strcmp(args[0], "cd") == 0)
+	if (ft_strcmp(args[0], "cd") == 0)
 		return (exec_cd(args));
-	else if (strcmp(args[0], "pwd") == 0)
+	else if (ft_strcmp(args[0], "pwd") == 0)
 		return (exec_pwd());
-	else if (strcmp(args[0], "echo") == 0)
+	else if (ft_strcmp(args[0], "echo") == 0)
 		return (exec_echo(args));
-	else if (strcmp(args[0], "env") == 0)
+	else if (ft_strcmp(args[0], "env") == 0)
 		return (exec_env());
-	else if (strcmp(args[0], "expot") == 0)
+	else if (ft_strcmp(args[0], "expot") == 0)
 		return (exec_export(args));
-	else if (strcmp(args[0], "unset") == 0)
+	else if (ft_strcmp(args[0], "unset") == 0)
 		return (exec_unset(args));
-	else if (strcmp(args[0], "exit") == 0)
+	else if (ft_strcmp(args[0], "exit") == 0)
 		return (exec_exit(args));
 	return (1);
 }

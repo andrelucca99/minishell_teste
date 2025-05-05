@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
+/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:52:09 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/02 15:37:34 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:27:13 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char *find_executable(char *cmd)
 	char *paths;
 	char *token;
 
-	if (strchr(cmd, '/'))
+	if (ft_strchr(cmd, '/'))
 		return (ft_strdup(cmd));
 	path = getenv("PATH");
 	if (!path)

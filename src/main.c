@@ -6,7 +6,7 @@
 /*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 16:07:32 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/05 14:13:53 by andre            ###   ########.fr       */
+/*   Updated: 2025/05/05 14:28:42 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,14 @@ void execute_command(char **args)
 
 void free_args(char **args)
 {
-    for (int i = 0; args[i]; i++)
+    int i;
+
+    i = 0;
+    while (args[i])
+    {
         free(args[i]);
+        i++;
+    }
     free(args);
 }
 
