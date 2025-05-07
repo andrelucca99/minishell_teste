@@ -2,7 +2,7 @@ NAME = minishell
 
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
-SRCS = src/main.c src/builtins.c src/parser.c src/executor.c
+SRCS = src/main.c src/builtins.c src/parser.c src/executor.c src/lexer.c
 OBJS = $(SRCS:.c=.o)
 LIBFT = libft
 LDFLAGS = -L$(LIBFT) -lft -lreadline

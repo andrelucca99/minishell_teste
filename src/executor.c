@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:37:17 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/05 14:24:26 by andre            ###   ########.fr       */
+/*   Updated: 2025/05/06 14:37:13 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int exec_cd(char **args)
+int	exec_cd(char **args)
 {
 	if (!args[1])
 		return (chdir(getenv("HOME")));
@@ -24,9 +24,9 @@ int exec_cd(char **args)
 	return (0);
 }
 
-int exec_pwd(void)
+int	exec_pwd(void)
 {
-	char cwd[1024];
+	char	cwd[1024];
 
 	if (getcwd(cwd, sizeof(cwd)))
 		printf("%s\n", cwd);
@@ -35,10 +35,10 @@ int exec_pwd(void)
 	return (0);
 }
 
-int exec_echo(char **args)
+int	exec_echo(char **args)
 {
-	int i;
-	int newline;
+	int	i;
+	int	newline;
 
 	i = 1;
 	newline = 1;
@@ -60,9 +60,9 @@ int exec_echo(char **args)
 	return (0);
 }
 
-int exec_env(void)
+int	exec_env(void)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (environ[i])
@@ -73,10 +73,10 @@ int exec_env(void)
 	return (0);
 }
 
-int exec_export(char **args)
+int	exec_export(char **args)
 {
-	char *eq;
-	int i;
+	char	*eq;
+	int		i;
 
 	i = 1;
 	while (args[i])
@@ -94,9 +94,9 @@ int exec_export(char **args)
 	return (0);
 }
 
-int exec_unset(char **args)
+int	exec_unset(char **args)
 {
-	int i;
+	int	i;
 
 	i = 1;
 	while (args[i])
@@ -107,9 +107,9 @@ int exec_unset(char **args)
 	return (0);
 }
 
-int exec_exit(char **args)
+int	exec_exit(char **args)
 {
-	int status;
+	int	status;
 
 	status = 0;
 	if (args[1])
@@ -118,7 +118,7 @@ int exec_exit(char **args)
 	exit(status);
 }
 
-int exec_builtin(char **args)
+int	exec_builtin(char **args)
 {
 	if (ft_strcmp(args[0], "cd") == 0)
 		return (exec_cd(args));

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 16:07:32 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/05 14:56:50 by andre            ###   ########.fr       */
+/*   Updated: 2025/05/07 15:48:52 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,13 +72,20 @@ int detect_output_redir(char **args, char **outfile)
 int detect_input_redir(char **args, char **infile)
 {
     int i;
+    int j;
 
     i = 0;
     while (args[i])
     {
         if (ft_strcmp(args[i], "<") == 0 && args[i + 1])
         {
-            *infile = args[i + 1];
+            *infile = ft_strdup(args[i + 1]);
+			j = i;
+			while (args[j + 2])
+			{
+				args[j] = args[j + 2];
+				j++;
+			}
             args[i] = NULL;
             return (1);
         }
@@ -112,6 +119,25 @@ void execute_command(char **args)
     free(cmd_path);
 }
 
+void	free_pipeline(char ***cmds, int n)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i < n)
+	{
+		j = 0;
+		while (cmds[i][j])
+		{
+			free(cmds[i][j]);
+			j++;
+		}
+		free(cmds[i]);
+		i++;
+	}
+}
+
 void free_args(char **args)
 {
     int i;
@@ -123,6 +149,13 @@ void free_args(char **args)
         i++;
     }
     free(args);
+}
+
+void print_tokens(t_token *tokens) {
+    while (tokens) {
+        printf("Token: %-10s | Type: %d\n", tokens->value, tokens->type);
+        tokens = tokens->next;
+    }
 }
 
 int main(void)
@@ -144,57 +177,85 @@ int main(void)
         args = parse_input(line);
         if (args && args[0])
         {
-            char *outfile = NULL, *infile = NULL;
-            int out_fd = -1, in_fd = -1;
-            int saved_stdout = -1, saved_stdin = -1;
-            int redir_out = detect_output_redir(args, &outfile);
-            int redir_in = detect_input_redir(args, &infile);
+			int		num_cmds = 0;
+			char	***cmds = split_pipeline(args, &num_cmds);
 
-            if (redir_out)
-            {
-                out_fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                if (out_fd < 0)
-                {
-                    perror("open");
-                    free_args(args);
-                    free(line);
-                    continue;
-                }
-                saved_stdout = dup(STDOUT_FILENO);
-                dup2(out_fd, STDOUT_FILENO);
-            }
-            if (redir_in)
-            {
-                in_fd = open(infile, O_RDONLY);
-                if (in_fd < 0)
-                {
-                    perror("open");
-                    free_args(args);
-                    free(line);
-                    continue;
-                }
-                saved_stdin = dup(STDIN_FILENO);
-                dup2(in_fd, STDIN_FILENO);
-            }
+			if (num_cmds == 1)
+			{
+				char *outfile = NULL, *infile = NULL;
+				int out_fd = -1, in_fd = -1;
+				int saved_stdout = -1, saved_stdin = -1;
+				int redir_out = detect_output_redir(args, &outfile);
+				int redir_in = detect_input_redir(args, &infile);
 
-            if (is_builtin(args[0]))
-                exec_builtin(args);
-            else
-                execute_command(args);
+				if (redir_out)
+				{
+					out_fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+					if (out_fd < 0)
+					{
+						perror("open");
+						free_args(args);
+						free(line);
+						continue ;
+					}
+					saved_stdout = dup(STDOUT_FILENO);
+					dup2(out_fd, STDOUT_FILENO);
+				}
+				if (redir_in)
+				{
+					in_fd = open(infile, O_RDONLY);
+					if (in_fd < 0)
+					{
+						perror("open");
+						free_args(args);
+						free(line);
+						continue ;
+					}
+					saved_stdin = dup(STDIN_FILENO);
+					dup2(in_fd, STDIN_FILENO);
+				}
 
-            // Restaura saída e entrada padrão
-            if (redir_out)
-            {
-                dup2(saved_stdout, STDOUT_FILENO);
-                close(saved_stdout);
-                close(out_fd);
-            }
-            if (redir_in)
-            {
-                dup2(saved_stdin, STDIN_FILENO);
-                close(saved_stdin);
-                close(in_fd);
-            }
+				if (is_builtin(args[0]))
+					exec_builtin(args);
+				else
+				{
+					pid_t	pid = fork();
+					if (pid == 0)
+					{
+						char	*path = find_executable(cmds[0][0]);
+						if (!path)
+						{
+							fprintf(stderr, "minishell: command not found: %s\n", cmds[0][0]);
+							exit(127);
+						}
+						execve(path, cmds[0], environ);
+						perror("execve");
+						exit(1);
+					}
+					else if (pid > 0)
+						waitpid(pid, NULL, 0);
+					else
+						perror("fork");
+				}
+				// Restaura saída e entrada padrão
+				if (redir_out)
+				{
+					dup2(saved_stdout, STDOUT_FILENO);
+					close(saved_stdout);
+					close(out_fd);
+				}
+
+				if (redir_in)
+				{
+					dup2(saved_stdin, STDIN_FILENO);
+					close(saved_stdin);
+					close(in_fd);
+				}
+			}
+			else
+				execute_pipeline(cmds, num_cmds);
+
+			free_pipeline(cmds, num_cmds);
         }
         free_args(args);
         free(line);
