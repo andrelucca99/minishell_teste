@@ -1,36 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strndup.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/08 14:56:29 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/09 16:11:12 by alucas-e         ###   ########.fr       */
+/*   Created: 2025/05/09 17:02:51 by alucas-e          #+#    #+#             */
+/*   Updated: 2025/05/09 17:15:19 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "./libft.h"
 
-int	main(void)
+char	*ft_strndup(const char *s, size_t n)
 {
-	char		*line;
-	t_token		*tokens;
-	t_command	*cmds;
+	size_t	len;
+	size_t	i;
+	char	*copy;
 
-	while (1)
+	len = 0;
+	while (s[len] && len < n)
+		len++;
+	copy = malloc(len + 1);
+	if (!copy)
+		return (NULL);
+	i = 0;
+	while (i < len)
 	{
-		line = readline("minishell$ ");
-		if (!line)
-			break ;
-		if (*line)
-			add_history(line);
-		tokens = lexer(line);
-		cmds = parse_tokens(tokens);
-		execute_commands(cmds);
-
-		free_tokens(tokens);
-		free(line);
+		copy[i] = s[i];
+		i++;
 	}
-	return (0);
+	copy[len] = '\0';
+	return (copy);
 }

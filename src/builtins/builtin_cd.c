@@ -1,25 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/30 14:25:57 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/06 14:36:15 by alucas-e         ###   ########.fr       */
+/*   Created: 2025/05/09 15:28:32 by alucas-e          #+#    #+#             */
+/*   Updated: 2025/05/09 15:30:15 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
-int	is_builtin(char *cmd)
+int	builtin_cd(char **args)
 {
-	return (ft_strcmp(cmd, "cd") == 0
-		|| ft_strcmp(cmd, "pwd") == 0
-		|| ft_strcmp(cmd, "echo") == 0
-		|| ft_strcmp(cmd, "env") == 0
-		|| ft_strcmp(cmd, "export") == 0
-		|| ft_strcmp(cmd, "unset") == 0
-		|| ft_strcmp(cmd, "exit") == 0
-	);
+	if (!args[1])
+		return (chdir(getenv("HOME")));
+	return (chdir(args[1]));
 }

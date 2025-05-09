@@ -6,133 +6,125 @@
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:37:17 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/06 14:37:13 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:11:06 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	exec_cd(char **args)
+// executor
+
+char	*find_executable(char *cmd)
 {
-	if (!args[1])
-		return (chdir(getenv("HOME")));
-	if (chdir(args[1]) != 0)
+	char	*path;
+	char	*paths;
+	char	*token;
+	char	fullpath[1024];
+
+	if (ft_strchr(cmd, '/'))
+		return (ft_strdup(cmd));
+	path = getenv("PATH");
+	if (!path)
+		return (NULL);
+	paths = ft_strdup(path);
+	token = ft_strtok(paths, ":");
+	while (token)
 	{
-		perror("cd");
-		return (1);
-	}
-	return (0);
-}
-
-int	exec_pwd(void)
-{
-	char	cwd[1024];
-
-	if (getcwd(cwd, sizeof(cwd)))
-		printf("%s\n", cwd);
-	else
-		perror("pwd");
-	return (0);
-}
-
-int	exec_echo(char **args)
-{
-	int	i;
-	int	newline;
-
-	i = 1;
-	newline = 1;
-
-	if (args[1] && ft_strcmp(args[1], "-n") == 0)
-	{
-		newline = 0;
-		i = 2;
-	}
-	while (args[i])
-	{
-		printf("%s", args[i]);
-		if (args[i + 1])
-			printf(" ");
-		i++;
-	}
-	if (newline)
-		printf("\n");
-	return (0);
-}
-
-int	exec_env(void)
-{
-	int	i;
-
-	i = 0;
-	while (environ[i])
-	{
-		printf("%s\n", environ[i]);
-		i++;
-	}
-	return (0);
-}
-
-int	exec_export(char **args)
-{
-	char	*eq;
-	int		i;
-
-	i = 1;
-	while (args[i])
-	{
-		eq = ft_strchr(args[i], '=');
-		if (eq)
+		snprintf(fullpath, sizeof(fullpath), "%s/%s", token, cmd);
+		if (access(fullpath, X_OK) == 0)
 		{
-			*eq = '\0';
-			setenv(args[i], eq + 1, 1);
+			free(paths);
+			return (ft_strdup(fullpath));
 		}
-		else
-			fprintf(stderr, "export: invalid format: %s\n", args[i]);
-		i++;
+		token = ft_strtok(NULL, ":");
 	}
-	return (0);
+	free(paths);
+	return (NULL);
 }
 
-int	exec_unset(char **args)
+void	execute_commands(t_command *cmds)
 {
-	int	i;
+	int		fd[2];
+	int		in_fd;
+	int		in;
+	int		out;
+	char	*path;
+	pid_t	pid;
 
-	i = 1;
-	while (args[i])
+	in_fd = STDIN_FILENO;
+
+	if (!cmds->next
+		&& is_builtin(cmds->args[0])
+		&& !cmds->input_file && !cmds->output_file)
 	{
-		unsetenv(args[i]);
-		i++;
+		exec_builtin(cmds->args);
+		return ;
 	}
-	return (0);
-}
 
-int	exec_exit(char **args)
-{
-	int	status;
+	while (cmds)
+	{
+		if (cmds->next)
+			pipe(fd);
 
-	status = 0;
-	if (args[1])
-		status = ft_atoi(args[1]);
-	printf("exit\n");
-	exit(status);
-}
+		pid = fork();
+		if (pid == 0)
+		{
+			if (cmds->input_file)
+			{
+				in = open(cmds->input_file, O_RDONLY);
+				if (in < 0)
+				{
+					perror("open input");
+					exit(1);
+				}
+				dup2(in, STDIN_FILENO);
+				close(in);
+			}
+			else if (in_fd != STDIN_FILENO)
+			{
+				dup2(in_fd, STDIN_FILENO);
+				close(in_fd);
+			}
 
-int	exec_builtin(char **args)
-{
-	if (ft_strcmp(args[0], "cd") == 0)
-		return (exec_cd(args));
-	else if (ft_strcmp(args[0], "pwd") == 0)
-		return (exec_pwd());
-	else if (ft_strcmp(args[0], "echo") == 0)
-		return (exec_echo(args));
-	else if (ft_strcmp(args[0], "env") == 0)
-		return (exec_env());
-	else if (ft_strcmp(args[0], "expot") == 0)
-		return (exec_export(args));
-	else if (ft_strcmp(args[0], "unset") == 0)
-		return (exec_unset(args));
-	else if (ft_strcmp(args[0], "exit") == 0)
-		return (exec_exit(args));
-	return (1);
+			if (cmds->output_file)
+			{
+				out = open(cmds->output_file,
+					O_WRONLY | O_CREAT | (cmds->append_mode ? O_APPEND : O_TRUNC), 0644); // mudar a logica aqui!!!!
+				if (out < 0)
+				{
+					perror("open output");
+					exit(1);
+				}
+				dup2(out, STDOUT_FILENO);
+				close(out);
+			}
+			else if (cmds->next)
+			{
+				dup2(fd[1], STDOUT_FILENO);
+				close(fd[1]);
+			}
+
+			if (is_builtin(cmds->args[0]))
+				exit(exec_builtin(cmds->args));
+
+			path = find_executable(cmds->args[0]);
+			if (!path)
+			{
+				fprintf(stderr, "command not found: %s\n", cmds->args[0]);
+				exit(127);
+			}
+			execve(path, cmds->args, environ);
+			perror("execve error");
+			exit(1);
+		}
+		if (in_fd != STDIN_FILENO)
+			close(in_fd);
+		if (cmds->next)
+		{
+			close(fd[1]);
+			in_fd = fd[0];
+		}
+		cmds = cmds->next;
+	}
+	while (wait(NULL) > 0);
 }

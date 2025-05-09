@@ -6,7 +6,7 @@
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:28:44 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/07 13:57:42 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:10:14 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,8 @@ void	ft_striteri(char *s, void (*f)(unsigned int, char *));
 size_t	ft_strlen(const char *str);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 size_t	ft_strlcat(char *dst, const char *src, size_t size);
+
+char	*ft_strndup(const char *s, size_t n);
+char	*ft_strtok(char *str, const char *delim);
 
 #endif
