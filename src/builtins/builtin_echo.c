@@ -1,36 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   builtin_echo.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/08 14:56:29 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/09 16:11:12 by alucas-e         ###   ########.fr       */
+/*   Created: 2025/05/09 15:28:32 by alucas-e          #+#    #+#             */
+/*   Updated: 2025/05/09 15:29:26 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
-int	main(void)
+int	builtin_echo(char **args)
 {
-	char		*line;
-	t_token		*tokens;
-	t_command	*cmds;
+	int	i;
 
-	while (1)
+	i = 1;
+	while (args[i])
 	{
-		line = readline("minishell$ ");
-		if (!line)
-			break ;
-		if (*line)
-			add_history(line);
-		tokens = lexer(line);
-		cmds = parse_tokens(tokens);
-		execute_commands(cmds);
-
-		free_tokens(tokens);
-		free(line);
+		printf("%s", args[i]);
+		if (args[i + 1])
+			printf(" ");
+		i++;
 	}
+	printf("\n");
 	return (0);
 }

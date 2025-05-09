@@ -1,36 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strtok.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/08 14:56:29 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/09 16:11:12 by alucas-e         ###   ########.fr       */
+/*   Created: 2025/05/09 17:09:33 by alucas-e          #+#    #+#             */
+/*   Updated: 2025/05/09 17:16:10 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "./libft.h"
 
-int	main(void)
+char	*ft_strtok(char *str, const char *delim)
 {
-	char		*line;
-	t_token		*tokens;
-	t_command	*cmds;
+	static char	*save;
+	char		*start;
 
-	while (1)
+	if (str)
+		save = str;
+	if (!save || !*save)
+		return (NULL);
+	while (*save && ft_strchr(delim, *save))
+		save++;
+	if (!*save)
+		return (NULL);
+	start = save;
+	while (*save && !ft_strchr(delim, *save))
+		save++;
+	if (*save)
 	{
-		line = readline("minishell$ ");
-		if (!line)
-			break ;
-		if (*line)
-			add_history(line);
-		tokens = lexer(line);
-		cmds = parse_tokens(tokens);
-		execute_commands(cmds);
-
-		free_tokens(tokens);
-		free(line);
+		*save = '\0';
+		save++;
 	}
-	return (0);
+	return (start);
 }

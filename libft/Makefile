@@ -1,7 +1,7 @@
 NAME = libft.a
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -fPIC
 
 SRC = ./ft_isascii.c \
 	  ./ft_isalpha.c \
@@ -37,6 +37,8 @@ SRC = ./ft_isascii.c \
 	  ./ft_itoa.c \
 	  ./ft_strmapi.c \
 	  ./ft_split.c \
+	  ./ft_strndup.c \
+	  ./ft_strtok.c \
 	  ./ft_strlcat.c
 
 OBJ = $(SRC:.c=.o)
