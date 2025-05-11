@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   tokens.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
+/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 16:10:46 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/09 16:14:32 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:27:39 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-t_token	*new_token(t_token_type type, const char *value)
+t_token *new_token(t_token_type type, const char *value)
 {
-	t_token	*token;
+	t_token *token;
 
 	token = malloc(sizeof(t_token));
 	if (!token)
@@ -25,14 +25,14 @@ t_token	*new_token(t_token_type type, const char *value)
 	return (token);
 }
 
-void	add_token(t_token **head, t_token *new)
+void add_token(t_token **head, t_token *new)
 {
-	t_token	*cur;
+	t_token *cur;
 
 	if (!*head)
 	{
 		*head = new;
-		return ;
+		return;
 	}
 	cur = *head;
 	while (cur->next)
@@ -40,7 +40,7 @@ void	add_token(t_token **head, t_token *new)
 	cur->next = new;
 }
 
-t_token_type	get_operator_type(const char *s, int *len)
+t_token_type get_operator_type(const char *s, int *len)
 {
 	if (s[0] == '>' && s[1] == '>')
 	{
@@ -70,15 +70,15 @@ t_token_type	get_operator_type(const char *s, int *len)
 	return (TOKEN_WORD);
 }
 
-void	free_tokens(t_token *tokens)
+void free_tokens(t_token *tokens)
 {
-	t_token	*tmp;
+	t_token *tmp;
 
 	while (tokens)
 	{
-		tmp = tokens;
-		tokens = tokens->next;
-		free(tmp->value);
-		free(tmp);
+		tmp = tokens->next;
+		free(tokens->value);
+		free(tokens);
+		tokens = tmp;
 	}
 }
