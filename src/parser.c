@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
+/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:52:09 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/09 17:12:22 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:15:43 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,30 @@
 
 // --- PARSER --- //
 
-t_command	*new_command(void)
+t_command *new_command(void)
 {
-	t_command	*cmd;
+	t_command *cmd;
 
-	cmd = calloc(1, sizeof(t_command));
+	cmd = malloc(sizeof(t_command));
+	if (!cmd)
+		return (NULL);
+	cmd->args = NULL;
+	cmd->input_file = NULL;
+	cmd->output_file = NULL;
+	cmd->append_mode = 0;
+	cmd->heredoc_delim = NULL;
+	cmd->next = NULL;
 	return (cmd);
 }
 
-void	add_command(t_command **head, t_command *new)
+void add_command(t_command **head, t_command *new)
 {
-	t_command	*cur;
+	t_command *cur;
 
 	if (!*head)
 	{
 		*head = new;
-		return ;
+		return;
 	}
 	cur = *head;
 	while (cur->next)
@@ -37,13 +45,13 @@ void	add_command(t_command **head, t_command *new)
 	cur->next = new;
 }
 
-t_command	*parse_tokens(t_token *tokens)
+t_command *parse_tokens(t_token *tokens)
 {
-	t_command	*cmds;
-	t_command	*cur;
-	int			argc;
-	int			i;
-	char		*argv[MAX_ARGS] = {0};
+	t_command *cmds;
+	t_command *cur;
+	int argc;
+	int i;
+	char *argv[MAX_ARGS] = {0};
 
 	cmds = NULL;
 	cur = new_command();
@@ -76,14 +84,24 @@ t_command	*parse_tokens(t_token *tokens)
 		}
 		else if (tokens->type == TOKEN_PIPE)
 		{
-			argv[argc] = NULL;
-			cur->args = calloc(argc + 1, sizeof(char *));
+			cur->args = malloc(sizeof(char *) * (argc + 1));
+			if (!cur->args)
+				return (NULL);
+
 			i = 0;
 			while (i < argc)
 			{
-				cur->args[i] = argv[i];
+				cur->args[i] = ft_strdup(argv[i]);
 				i++;
 			}
+			i = 0;
+			while (i < argc)
+			{
+				free(argv[i]); // limpar buffer temporário
+				argv[i] = NULL;
+				i++;
+			}
+			cur->args[argc] = NULL;
 			add_command(&cmds, cur);
 			cur = new_command();
 			argc = 0;
@@ -93,12 +111,23 @@ t_command	*parse_tokens(t_token *tokens)
 
 	if (argc > 0)
 	{
-		argv[argc] = NULL;
-		cur->args = calloc(argc + 1, sizeof(char *));
+		cur->args = malloc(sizeof(char *) * (argc + 1));
+		if (!cur->args)
+			return (NULL);
+
 		i = 0;
 		while (i < argc)
 		{
-			cur->args[i] = argv[i];
+			cur->args[i] = ft_strdup(argv[i]);
+			i++;
+		}
+		cur->args[argc] = NULL;
+
+		i = 0;
+		while (i < argc)
+		{
+			free(argv[i]); // limpar buffer temporário
+			argv[i] = NULL;
 			i++;
 		}
 	}
@@ -106,7 +135,7 @@ t_command	*parse_tokens(t_token *tokens)
 	return (cmds);
 }
 
-t_token	*lexer(const char *line)
+t_token *lexer(const char *line)
 {
 	t_token *tokens = NULL;
 	int i = 0;
@@ -135,4 +164,33 @@ t_token	*lexer(const char *line)
 		}
 	}
 	return (tokens);
+}
+
+void free_commands(t_command *cmds)
+{
+	t_command *tmp;
+	int i;
+
+	while (cmds)
+	{
+		tmp = cmds->next;
+		if (cmds->args)
+		{
+			i = 0;
+			while (cmds->args[i])
+			{
+				free(cmds->args[i]);
+				i++;
+			}
+			free(cmds->args);
+		}
+		if (cmds->input_file)
+			free(cmds->input_file);
+		if (cmds->output_file)
+			free(cmds->output_file);
+		if (cmds->heredoc_delim)
+			free(cmds->heredoc_delim);
+		free(cmds);
+		cmds = tmp;
+	}
 }
