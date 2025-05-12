@@ -6,7 +6,7 @@
 /*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 16:08:13 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/11 14:16:11 by andre            ###   ########.fr       */
+/*   Updated: 2025/05/12 16:46:48 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 #include <fcntl.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -77,5 +78,8 @@ void add_token(t_token **head, t_token *new);
 t_token_type get_operator_type(const char *s, int *len);
 t_token *new_token(t_token_type type, const char *value);
 void free_commands(t_command *cmds);
+
+/* signal */
+void handle_sigint(int signo);
 
 #endif

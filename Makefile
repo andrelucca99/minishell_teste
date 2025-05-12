@@ -2,7 +2,7 @@ NAME = minishell
 
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
-SRCS = src/main.c src/builtins/builtins.c src/parser.c src/executor.c src/tokens.c src/builtins/builtin_echo.c src/builtins/builtin_pwd.c src/builtins/builtin_env.c src/builtins/builtin_cd.c src/builtins/builtin_exit.c
+SRCS = src/main.c src/sigint.c src/builtins/builtins.c src/parser.c src/executor.c src/tokens.c src/builtins/builtin_echo.c src/builtins/builtin_pwd.c src/builtins/builtin_env.c src/builtins/builtin_cd.c src/builtins/builtin_exit.c
 OBJS = $(SRCS:.c=.o)
 LIBFT = libft
 LDFLAGS = -L$(LIBFT) -lft -lreadline

@@ -1,43 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   sigint.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/08 14:56:29 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/12 16:27:00 by andre            ###   ########.fr       */
+/*   Created: 2025/05/12 16:46:15 by andre             #+#    #+#             */
+/*   Updated: 2025/05/12 16:46:27 by andre            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int main(void)
+void handle_sigint(int signo)
 {
-	char *line;
-	t_token *tokens;
-	t_command *cmds;
-
-	signal(SIGINT, handle_sigint);
-	signal(SIGQUIT, SIG_IGN);
-
-	while (1)
-	{
-		line = readline("minishell$ ");
-		if (!line)
-		{
-			printf("exit\n");
-			break;
-		}
-		if (*line)
-			add_history(line);
-		tokens = lexer(line);
-		cmds = parse_tokens(tokens);
-		free_tokens(tokens);
-		execute_commands(cmds);
-		free_commands(cmds);
-
-		free(line);
-	}
-	return (0);
+  (void)signo;
+  write(STDOUT_FILENO, "\n", 1);
+  rl_on_new_line();
+  rl_replace_line("", 0);
+  rl_redisplay();
 }
