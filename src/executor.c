@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: andre <andre@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:37:17 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/12 16:30:40 by andre            ###   ########.fr       */
+/*   Updated: 2025/05/13 16:30:28 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,8 +178,8 @@ void execute_commands(t_command *cmds)
 		pid = fork();
 		if (pid == 0)
 		{
-			signal(SIGINT, handle_sigint);
-			signal(SIGQUIT, SIG_IGN);
+			signal(SIGQUIT, SIG_DFL);
+			signal(SIGINT, SIG_DFL);
 
 			if (cmds->input_file)
 			{
@@ -241,6 +241,16 @@ void execute_commands(t_command *cmds)
 		cmds = cmds->next;
 	}
 
-	while (wait(NULL) > 0)
-		;
+	int status;
+	while (wait(&status) > 0)
+	{
+		if (WIFSIGNALED(status))
+		{
+			int sig = WTERMSIG(status);
+			if (sig == SIGQUIT)
+				write(STDERR_FILENO, "Quit (core dumped)\n", 20);
+			else if (sig == SIGINT)
+				write(STDERR_FILENO, "\n" , 1);
+		}
+	}
 }
