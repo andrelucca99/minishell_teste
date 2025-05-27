@@ -6,7 +6,7 @@
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 14:37:17 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/14 19:43:15 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/27 15:05:44 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ static void	setup_redirections(t_command *cmd, int fd_in, int fd[2])
 		if (in < 0)
 		{
 			perror("open input");
+			gc_clear();
 			exit(1);
 		}
 		dup2(in, STDIN_FILENO);
@@ -41,6 +42,7 @@ static void	setup_redirections(t_command *cmd, int fd_in, int fd[2])
 		if (out < 0)
 		{
 			perror("open output");
+			gc_clear();
 			exit(1);
 		}
 		dup2(out, STDOUT_FILENO);
@@ -57,6 +59,7 @@ static void	setup_redirections(t_command *cmd, int fd_in, int fd[2])
 static void	execute_child(t_command *cmd, int fd_in, int fd[2])
 {
 	char	*path;
+	int		tmp;
 
 	signal(SIGQUIT, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
@@ -64,16 +67,22 @@ static void	execute_child(t_command *cmd, int fd_in, int fd[2])
 	setup_redirections(cmd, fd_in, fd);
 
 	if (is_builtin(cmd->args[0]))
-		exit(exec_builtin(cmd->args));
+		{
+			tmp = exec_builtin(cmd->args);
+			gc_clear();
+			exit(tmp);
+		}
 
 	path = find_executable(cmd->args[0]);
 	if (!path)
 	{
 		fprintf(stderr, "command not found: %s\n", cmd->args[0]);
+		gc_clear();
 		exit(127);
 	}
 	execve(path, cmd->args, environ);
 	perror("execve");
+	gc_clear();
 	exit(1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 16:08:13 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/14 19:39:03 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:35:03 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,17 @@ typedef struct s_command
 	struct s_command	*next;
 }	t_command;
 
+typedef struct s_gc_node
+{
+	void			*ptr;
+	struct s_gc_node	*next;
+}	t_gc_node;
+
+typedef struct s_gc
+{
+	t_gc_node *head;
+}	t_gc;
+
 /* builtins */
 
 int	is_builtin(char *cmd);
@@ -85,5 +96,13 @@ void			add_command(t_command **head, t_command *new);
 
 /* signal */
 void			handle_sigint(int signo);
+
+/* garbage free */
+void gc_clear(void);
+char *gc_strndup(const char *s, size_t n);
+char *gc_strdup(const char *s);
+void *gc_malloc(size_t size);
+
+void	gc_list(void);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 19:30:34 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/14 19:38:59 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/26 15:44:04 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,11 @@ char	*find_executable(char *cmd)
 	char	fullpath[1024];
 
 	if (ft_strchr(cmd, '/'))
-		return (ft_strdup(cmd));
+		return (gc_strdup(cmd));
 	path = getenv("PATH");
 	if (!path)
 		return (NULL);
-	paths = ft_strdup(path);
+	paths = gc_strdup(path);
 	token = ft_strtok(paths, ":");
 	while (token)
 	{
@@ -32,7 +32,7 @@ char	*find_executable(char *cmd)
 		if (access(fullpath, X_OK) == 0)
 		{
 			free(paths);
-			return (ft_strdup(fullpath));
+			return (gc_strdup(fullpath));
 		}
 		token = ft_strtok(NULL, ":");
 	}

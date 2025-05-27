@@ -6,7 +6,7 @@
 /*   By: alucas-e <alucas-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 16:10:46 by alucas-e          #+#    #+#             */
-/*   Updated: 2025/05/14 16:28:33 by alucas-e         ###   ########.fr       */
+/*   Updated: 2025/05/27 15:06:29 by alucas-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@ t_token	*new_token(t_token_type type, const char *value)
 {
 	t_token	*token;
 
-	token = malloc(sizeof(t_token));
+	token = gc_malloc(sizeof(t_token));
 	if (!token)
 		return (NULL);
 	token->type = type;
-	token->value = ft_strdup(value);
+	token->value = gc_strdup(value);
 	token->next = NULL;
 	return (token);
 }
